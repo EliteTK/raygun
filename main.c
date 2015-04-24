@@ -71,8 +71,10 @@ int main(void)
 		double hdpp = dpp / 2;
 
 		uint32_t begun = SDL_GetTicks();
-		for (uint16_t x = 0; x < width; x++)
-			for (uint16_t y = 0; y < height; y++) {
+#pragma omp parallel for
+		for (uint16_t x = 0; x < (uint16_t)width; x++)
+#pragma omp parallel for
+			for (uint16_t y = 0; y < (uint16_t)height; y++) {
 				double *ray = vec_perm(vec_norm(vec(plane_hwidth - x * dpp + hdpp, -plane_hheight + y * dpp + hdpp, -1)));
 
 				sdl_buffer[y * (uint16_t)width + x] = cast_ray(ray, eye);

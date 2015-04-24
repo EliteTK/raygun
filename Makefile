@@ -12,7 +12,7 @@ DEBUG ?= 0
 ifeq ($(DEBUG), 1)
 	CFLAGS += -Og -g
 else
-	CFLAGS += -flto -O2
+	CFLAGS += -flto -O2 -fopenmp
 	LDFLAGS += -flto -O2
 endif
 
