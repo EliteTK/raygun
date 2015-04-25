@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -45,7 +46,7 @@ colour_t cast_ray(double *origin, double *direction)
 	if (bright > 1)
 		bright = 1;
 
-	retval = (colour_t){{bright * 255, bright * 255, bright * 255, 255}};
+	retval = (colour_t){{bright * (hit_normal[2] + 1.0) * 0.5 * 255, bright * (hit_normal[1] + 1.0) * 0.5 * 255, bright * (hit_normal[0] + 1.0) * 0.5 * 255, 255}};
 
 	vec_del(hit_pos);
 	vec_del(hit_normal);
