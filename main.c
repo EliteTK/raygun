@@ -12,6 +12,7 @@ static const double width = 640, height = 480, fov = 5;
 struct sphere {
 	double *point;
 	double radius;
+	double specularity;
 };
 
 double *light;
@@ -21,20 +22,21 @@ colour_t cast_ray(double *origin, double *direction)
 {
 	colour_t retval;
 
-	double closest_len = vec_dot(origin, sphere.point);
-	double closest_dist = vec_len(vec_addm(vec_addm(vec_blank(3), origin, closest_len), sphere.point, -1));
+	double closest_len = vec_dot(direction, sphere.point);
+	double closest_dist = vec_len(vec_addm(vec_addm(vec_blank(3), direction, closest_len), sphere.point, -1));
 
 	if (closest_dist >= sphere.radius) {
 		retval = (colour_t){{0, 0, 0, 255}};
 		goto fail;
 	}
 
-	double *hit_pos = vec_perm(vec_addm(vec_blank(3), origin, closest_len - sqrt(sphere.radius * sphere.radius - closest_dist * closest_dist)));
+	double *hit_pos = vec_perm(vec_addm(vec_blank(3), direction, closest_len - sqrt(sphere.radius * sphere.radius - closest_dist * closest_dist)));
 	double *hit_normal = vec_perm(vec_norm(vec_addm(hit_pos, sphere.point, -1)));
 
-	/*double *hit_reflect = vec_addm(vec_addm(vec_blank(3), hit_normal, -vec_dot(origin, hit_normal)), origin, 2);*/
+	/*double *hit_reflect = vec_norm(vec_addm(vec_addm(vec_blank(3), hit_normal, -vec_dot(direction, hit_normal)), direction, 2));*/
 
 	/*double specular = vec_dot(hit_reflect, vec_norm(vec_addm(light, hit_pos, -1)));*/
+	double specular = 0;
 	/*if (specular < 0)*/
 		/*specular = 0;*/
 
@@ -42,7 +44,7 @@ colour_t cast_ray(double *origin, double *direction)
 	if (diffuse < 0)
 		diffuse = 0;
 
-	double bright = diffuse/* + specular*/;
+	double bright = diffuse * (1.0 - sphere.specularity) + specular * sphere.specularity;
 	if (bright > 1)
 		bright = 1;
 
@@ -57,7 +59,7 @@ fail:
 int main(void)
 {
 	double *eye = vec_perm(vec(0, 0, 0));
-	sphere = (struct sphere){vec_perm(vec(0.0, 0.0, -0.9)), 0.3};
+	sphere = (struct sphere){vec_perm(vec(0.0, 0.0, -0.9)), 0.3, 0.1};
 	light = vec_perm(vec(1.0, -1.0, -0.0));
 
 	sdl_prepare(width, height);
@@ -78,7 +80,7 @@ int main(void)
 			for (uint16_t y = 0; y < (uint16_t)height; y++) {
 				double *ray = vec_perm(vec_norm(vec(plane_hwidth - x * dpp + hdpp, -plane_hheight + y * dpp + hdpp, -1)));
 
-				sdl_buffer[y * (uint16_t)width + x] = cast_ray(ray, eye);
+				sdl_buffer[y * (uint16_t)width + x] = cast_ray(eye, ray);
 				vec_del(ray);
 			}
 		sdl_draw();
