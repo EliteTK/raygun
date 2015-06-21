@@ -26,7 +26,7 @@ colour_t cast_ray(double *origin, double *direction)
 	double closest_dist = vec_len(vec_addm(vec_addm(vec_blank(3), direction, closest_len), sphere.point, -1));
 
 	if (closest_dist >= sphere.radius) {
-		retval = (colour_t){{0, 0, 0, 255}};
+		retval = argb8888(255, 0, 0, 0);
 		goto fail;
 	}
 
@@ -48,7 +48,11 @@ colour_t cast_ray(double *origin, double *direction)
 	if (bright > 1)
 		bright = 1;
 
-	retval = (colour_t){{bright * (hit_normal[2] + 1.0) * 0.5 * 255, bright * (hit_normal[1] + 1.0) * 0.5 * 255, bright * (hit_normal[0] + 1.0) * 0.5 * 255, 255}};
+	/*retval = (colour_t){{bright * (hit_normal[2] + 1.0) * 0.5 * 255, bright * (hit_normal[1] + 1.0) * 0.5 * 255, bright * (hit_normal[0] + 1.0) * 0.5 * 255, 255}};*/
+	retval = argb8888(255,
+			  bright * (hit_normal[0] + 1.0) * 0.5 * 255,
+			  bright * (hit_normal[1] + 1.0) * 0.5 * 255,
+			  bright * (hit_normal[2] + 1.0) * 0.5 * 255);
 
 	vec_del(hit_pos);
 	vec_del(hit_normal);
@@ -65,7 +69,7 @@ int main(void)
 	sdl_prepare(width, height);
 
 	for (size_t i = 0; i < width * height; i++)
-		sdl_buffer[i] = (colour_t){{0, 0, 0, 255}};
+		sdl_buffer[i] = argb8888(255, 0, 0, 0);
 
 	for (double fov = 0; fov < 180; fov += 0.5) {
 		double plane_hwidth = sin((fov / 180.0 * M_PI) / 2.0);

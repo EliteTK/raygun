@@ -3,12 +3,13 @@
 
 #include <stdint.h>
 
-typedef union colour_t {
-	struct {
-		uint8_t a, r, g, b;
-	} c;
-	uint32_t colour;
-} colour_t;
+typedef uint8_t channel_t;
+typedef uint32_t colour_t;
+
+static inline colour_t argb8888(channel_t a, channel_t r, channel_t g, channel_t b)
+{
+	return a << 24 | r << 16 | g << 8 | b;
+}
 
 colour_t *sdl_buffer;
 

@@ -186,3 +186,8 @@ double *vec_norm(double * const vector)
 
 	return output;
 }
+
+double *vec_mirr(double * const vector, double * const normal)
+{
+	return vec(0, 0, 0);
+}
